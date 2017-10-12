@@ -61,7 +61,8 @@ class Manage extends Admin_Controller {
 			{
 				if($rtime['failure_times'] > $maxloginfailedtimes) {
 					$minute = 60-floor((SYS_TIME-$rtime['logintime'])/60);
-					exit(json_encode(array('status'=>false,'tips'=>' 密码尝试次数过多，被锁定一个小时')));
+                    if($minute>0)
+					exit(json_encode(array('status'=>false,'tips'=>'密码尝试次数过多，被锁定一个小时,剩余'.$minute.'分钟')));
 				}
 			}
 
@@ -72,9 +73,9 @@ class Manage extends Admin_Controller {
 
 			$ip = $this->input->ip_address();
 			if($r['password'] != $password) {
-				if($rtime && $rtime['failure_times'] < $maxloginfailedtimes) {
+				if($rtime && $rtime['failure_times'] <= $maxloginfailedtimes) {
 					$times = $maxloginfailedtimes-intval($rtime['failure_times']);
-					$this->Times_model->update(array('login_ip'=>$ip,'is_admin'=>1,'failure_times'=>' +1'),array('username'=>$username));
+					$this->Times_model->update(array('login_ip'=>$ip,'is_admin'=>1,'failure_times'=>'+=1'),array('username'=>$username));
 				} else {
 					$this->Times_model->delete(array('username'=>$username,'is_admin'=>1));
 					$this->Times_model->insert(array('username'=>$username,'login_ip'=>$ip,'is_admin'=>1,'login_time'=>SYS_TIME,'failure_times'=>1));
