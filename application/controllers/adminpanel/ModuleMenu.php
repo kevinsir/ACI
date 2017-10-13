@@ -375,6 +375,7 @@ class ModuleMenu extends Admin_Controller {
 		foreach($this->menus as $cid => $cat) {
 			if($cat['parent_id'] != 0 && !isset($this->menus[$cat['parent_id']])) {
 				$this->Module_menu_model->delete(array('menu_id'=>$cid));
+				unset($this->menus[$cid]);
 			}
 		}
 
